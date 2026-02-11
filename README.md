@@ -1,18 +1,7 @@
-# mb2-template: MicroBit 2 Rust embedded project template
+Motion sensor [Doc](https://github.com/microbit-foundation/microbit-v2-hardware/blob/main/V2.21/MicroBit_V2.2.1_nRF52820%20schematic.PDF)
 
-To use this [Github template
-repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template):
+![Motion sensor schematic](./imgs/MotionSensor.png)
 
-1. Follow the instructions linked above to make a Github repo
-   for your project.
-   
-2. If needed, do the following to set up your tools:
-
-       rustup target add thumbv7em-none-eabihf
-       rustup component add llvm-tools
-       cargo install cargo-binutils
-       cargo install --locked probe-rs-tools
-
-3. Edit this `README.md`, the `Cargo.toml` and the stuff in
-   `src/` to get the names right and the template to what
-   you need.
+https://tech.microbit.org/hardware/schematic/
+P0.08 	I2C_INT_SCL
+P0.16 	I2C_INT_SDA

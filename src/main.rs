@@ -73,6 +73,9 @@ fn init() -> ! {
     let mut dis = Level::new(timer, display);
     dis.set_delay(100);
     
+    // P0.08 	I2C_INT_SCL
+    // P0.16 	I2C_INT_SDA
+
     loop {
         
 
