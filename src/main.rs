@@ -28,9 +28,7 @@ impl<T: DelayNs> Level <T> {
         Self { timer: timer, display: display, position: Position {x:0, y:0} }
     }
 
-    fn draw(&mut self) {
-        let x = 0;
-        let y = 2;
+    fn draw(&mut self, x: usize, y: usize) {
         let mut display = [[0; 5]; 5];
 
         display[x][y] = 1;
@@ -38,9 +36,20 @@ impl<T: DelayNs> Level <T> {
         self.display.show(&mut self.timer, display, 100);
     }
 
-    fn set(&mut self, x: u8, y: u8) {
+    fn set(&mut self, x: i8, y: i8) {
         
-        self.draw();
+        let x = match x {
+            2.. => { 2 }
+            ..-2 => { -2 }
+            _ => { x }
+        };
+        let y = match y {
+            2.. => { 2 }
+            ..-2 => { -2 }
+            _ => { y }
+        };
+
+        self.draw((x+2) as usize, (y+2) as usize);
     }
 
 }
@@ -59,7 +68,7 @@ fn init() -> ! {
     let mut dis = Level::new(timer, display);
     
     loop {
-        dis.set();
+        dis.set(0, 0);
         
     }
 } 
