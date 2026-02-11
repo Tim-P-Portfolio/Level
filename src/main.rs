@@ -20,12 +20,13 @@ struct Position {
 struct Level <T: DelayNs> {
     display: Display,
     position: Position,
-    timer: T
+    timer: T,
+    delay: u32,
 }
 
 impl<T: DelayNs> Level <T> {
     fn new(timer: T, display: Display) -> Self {
-        Self { timer: timer, display: display, position: Position {x:0, y:0} }
+        Self { timer: timer, display: display, position: Position {x:0, y:0}, delay: 100 }
     }
 
     fn draw(&mut self, x: usize, y: usize) {
@@ -33,7 +34,11 @@ impl<T: DelayNs> Level <T> {
 
         display[x][y] = 1;
 
-        self.display.show(&mut self.timer, display, 100);
+        self.display.show(&mut self.timer, display, self.delay);
+    }
+
+    pub fn set_delay(&mut self, delay: u32) {
+        self.delay = delay;
     }
 
     pub fn set(&mut self, x: i8, y: i8) {
@@ -66,6 +71,7 @@ fn init() -> ! {
     let display = display::blocking::Display::new(board.display_pins);
 
     let mut dis = Level::new(timer, display);
+    dis.set_delay(100);
     
     loop {
         
