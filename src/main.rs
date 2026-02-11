@@ -36,7 +36,7 @@ impl<T: DelayNs> Level <T> {
         self.display.show(&mut self.timer, display, 100);
     }
 
-    fn set(&mut self, x: i8, y: i8) {
+    pub fn set(&mut self, x: i8, y: i8) {
         
         let x = match x {
             2.. => { 2 }
@@ -70,8 +70,8 @@ fn init() -> ! {
     loop {
         
 
-        for x in -2..=2 {
-            for y in -2..=2 {
+        for x in -3..=3 {
+            for y in -3..=3 {
                 dis.set(x, y);
             }
         }
