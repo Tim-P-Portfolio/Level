@@ -129,7 +129,7 @@ fn init() -> ! {
         let button_a_pressed = button_a.is_low().unwrap();
         let button_b_pressed = button_b.is_low().unwrap();
 
-
+        // Set state based on button pressed
         if !button_a_pressed && button_b_pressed {
             fine_mode = true;
         }
@@ -138,15 +138,16 @@ fn init() -> ! {
         }
 
         // Set multiplier based on mode
-        let fine_mode_multiplier = if fine_mode { 25.0 } else { 250.0 };
+        let multiplier = if fine_mode { 25.0 } else { 250.0 };
 
-        
+        // Get x and y positions from acceleration data, and split into 5 parts
+        let x = ((-accel.x_mg() as f32) / multiplier).round() as i8;
+        let y = ((accel.y_mg() as f32) / multiplier).round() as i8;
 
-        let x = ((-accel.x_mg() as f32) / fine_mode_multiplier).round() as i8;
-        let y = ((accel.y_mg() as f32) / fine_mode_multiplier).round() as i8;
 
         rprintln!("{}, {:?}, {:?}", fine_mode, x, y);
 
+        // If the microbit is right side up display the point
         if accel.z_mg() < 0 {
             dis.set(y, x);
         }
