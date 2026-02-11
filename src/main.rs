@@ -68,7 +68,13 @@ fn init() -> ! {
     let mut dis = Level::new(timer, display);
     
     loop {
-        dis.set(0, 0);
+        
+
+        for x in -2..=2 {
+            for y in -2..=2 {
+                dis.set(x, y);
+            }
+        }
         
     }
 } 
