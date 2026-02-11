@@ -114,6 +114,9 @@ fn init() -> ! {
         )
         .unwrap();
 
+    let mut button_a = board.buttons.button_a.into_pullup_input();
+    let mut button_b = board.buttons.button_b.into_pullup_input();
+
     loop {
         // let status = sensor.mag_status();
 
@@ -125,7 +128,9 @@ fn init() -> ! {
             }
         };
 
-
+    
+        let button_a_pressed = button_a.is_low().unwrap();
+        let button_b_pressed = button_b.is_low().unwrap();
         
 
         let x = ((-accel.x_mg() as f32) / 250.0).round() as i8;
@@ -139,12 +144,5 @@ fn init() -> ! {
         if accel.z_mg() < 0 {
             dis.set(y, x);
         }
-
-        // for x in -3..=3 {
-        //     for y in -3..=3 {
-        //         dis.set(x, y);
-        //     }
-        // }
-        // timer1.delay(100);
     }
 }
