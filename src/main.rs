@@ -132,11 +132,19 @@ fn init() -> ! {
         let button_a_pressed = button_a.is_low().unwrap();
         let button_b_pressed = button_b.is_low().unwrap();
 
-        let fine_mode = false;
+        let mut fine_mode = false;
+        let fine_mode_multiplier = 10;
+
+        if button_b_pressed && !button_a_pressed {
+            fine_mode = true;
+        }
+        if button_a_pressed && !button_b_pressed {
+            fine_mode = false;
+        }
         
 
-        let x = ((-accel.x_mg() as f32) / 250.0).round() as i8;
-        let y = ((accel.y_mg() as f32) / 250.0).round() as i8;
+        let x = ((-accel.x_mg() as f32) / 250.0 / (fine_mode_multiplier * fine_mode as u8) as f32).round() as i8;
+        let y = ((accel.y_mg() as f32) / 250.0 / (fine_mode_multiplier * fine_mode as u8) as f32).round() as i8;
 
         rprintln!("{:?}, {:?}", x, y);
 
