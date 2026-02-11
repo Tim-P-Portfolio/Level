@@ -20,14 +20,10 @@ use lsm303agr;
 
 use num_traits::float::Float;
 
-struct Position {
-    x: u8,
-    y: u8,
-}
+
 
 struct Level<T: DelayNs> {
     display: Display,
-    position: Position,
     timer: T,
     delay: u32,
 }
@@ -37,14 +33,15 @@ impl<T: DelayNs> Level<T> {
         Self {
             timer: timer,
             display: display,
-            position: Position { x: 0, y: 0 },
             delay: 100,
         }
     }
 
+    /// Draw unclamped position to mb2 display
     fn draw(&mut self, x: usize, y: usize) {
         let mut display = [[0; 5]; 5];
 
+        // Set led at coordinate: on
         display[x][y] = 1;
 
         self.display.show(&mut self.timer, display, self.delay);
@@ -54,7 +51,9 @@ impl<T: DelayNs> Level<T> {
         self.delay = delay;
     }
 
+    /// Draw on mb2 display, coordinate relitive to center
     pub fn set(&mut self, x: i8, y: i8) {
+        // Clamp x and y
         let x = match x {
             2.. => 2,
             ..-2 => -2,
@@ -78,13 +77,12 @@ fn init() -> ! {
     let mut timer0 = Timer::new(board.TIMER0);
     let mut timer1 = Timer::new(board.TIMER1);
 
-    let pos = Position { x: 0, y: 0 };
-
     let display = display::blocking::Display::new(board.display_pins);
 
-    let mut dis = Level::new(timer0, display);
-    dis.set_delay(200);
+    let mut led_display = Level::new(timer0, display);
+    led_display.set_delay(200);
 
+    // Setup I2C Two wire connection
     // P0.08 	I2C_INT_SCL
     // P0.16 	I2C_INT_SDA
     let i2c = Twim::new(
@@ -129,7 +127,7 @@ fn init() -> ! {
         let button_a_pressed = button_a.is_low().unwrap();
         let button_b_pressed = button_b.is_low().unwrap();
 
-
+        // Set state based on button pressed
         if !button_a_pressed && button_b_pressed {
             fine_mode = true;
         }
@@ -138,17 +136,18 @@ fn init() -> ! {
         }
 
         // Set multiplier based on mode
-        let fine_mode_multiplier = if fine_mode { 25.0 } else { 250.0 };
+        let multiplier = if fine_mode { 25.0 } else { 250.0 };
 
-        
+        // Get x and y positions from acceleration data, and split into 5 parts
+        let x = ((-accel.x_mg() as f32) / multiplier).round() as i8;
+        let y = ((accel.y_mg() as f32) / multiplier).round() as i8;
 
-        let x = ((-accel.x_mg() as f32) / fine_mode_multiplier).round() as i8;
-        let y = ((accel.y_mg() as f32) / fine_mode_multiplier).round() as i8;
 
         rprintln!("{}, {:?}, {:?}", fine_mode, x, y);
 
+        // If the microbit is right side up display the point
         if accel.z_mg() < 0 {
-            dis.set(y, x);
+            led_display.set(y, x);
         }
     }
 }
