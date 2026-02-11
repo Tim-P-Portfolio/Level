@@ -3,7 +3,7 @@
 
 use cortex_m::delay;
 use cortex_m_rt::entry;
-use embedded_hal::{delay::DelayNs, digital::OutputPin, i2c::I2c};
+use embedded_hal::{delay::DelayNs, i2c::I2c, digital::{OutputPin, InputPin}};
 use microbit::{
     board::{Board, I2CInternalPins},
     display::{self, blocking::Display},
@@ -131,15 +131,14 @@ fn init() -> ! {
     
         let button_a_pressed = button_a.is_low().unwrap();
         let button_b_pressed = button_b.is_low().unwrap();
+
+        let fine_mode = false;
         
 
         let x = ((-accel.x_mg() as f32) / 250.0).round() as i8;
         let y = ((accel.y_mg() as f32) / 250.0).round() as i8;
 
-
-
         rprintln!("{:?}, {:?}", x, y);
-
 
         if accel.z_mg() < 0 {
             dis.set(y, x);
