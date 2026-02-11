@@ -21,7 +21,6 @@ use lsm303agr;
 use num_traits::float::Float;
 
 
-
 struct Level<T: DelayNs> {
     display: Display,
     timer: T,
