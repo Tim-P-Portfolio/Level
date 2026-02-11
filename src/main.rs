@@ -28,8 +28,19 @@ impl<T: DelayNs> Level <T> {
         Self { timer: timer, display: display, position: Position {x:0, y:0} }
     }
 
-    fn set(&mut self) {
-        self.display.show(&mut self.timer, [[1; 5];5], 100)
+    fn draw(&mut self) {
+        let x = 0;
+        let y = 2;
+        let mut display = [[0; 5]; 5];
+
+        display[x][y] = 1;
+
+        self.display.show(&mut self.timer, display, 100);
+    }
+
+    fn set(&mut self, x: u8, y: u8) {
+        
+        self.draw();
     }
 
 }
@@ -43,11 +54,12 @@ fn init() -> ! {
 
     let pos = Position {x: 0, y: 0};
     
-    let mut display = display::blocking::Display::new(board.display_pins);
+    let display = display::blocking::Display::new(board.display_pins);
 
     let mut dis = Level::new(timer, display);
     
     loop {
         dis.set();
+        
     }
 } 
