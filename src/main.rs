@@ -105,13 +105,6 @@ fn init() -> ! {
             lsm303agr::AccelOutputDataRate::Hz100,
         )
         .unwrap();
-    sensor
-        .set_mag_mode_and_odr(
-            &mut timer1,
-            lsm303agr::MagMode::LowPower,
-            lsm303agr::MagOutputDataRate::Hz10,
-        )
-        .unwrap();
 
     let mut button_a = board.buttons.button_a.into_pullup_input();
     let mut button_b = board.buttons.button_b.into_pullup_input();
@@ -119,8 +112,11 @@ fn init() -> ! {
     let mut fine_mode = false;
 
     loop {
-        // let status = sensor.mag_status();
+        // Sensor status loop: 
+        // https://docs.rust-embedded.org/discovery/microbit/10-punch-o-meter/my-solution.html 
+        while !sensor.accel_status().unwrap().xyz_new_data() {}
 
+        // Get acceleration data
         let accel = match sensor.acceleration() {
             Ok(v) => v,
             Err(e) => {
@@ -129,19 +125,20 @@ fn init() -> ! {
             }
         };
 
-    
+        // Get button presses from front micro switches
         let button_a_pressed = button_a.is_low().unwrap();
         let button_b_pressed = button_b.is_low().unwrap();
 
 
-        if button_b_pressed && !button_a_pressed {
+        if !button_a_pressed && button_b_pressed {
             fine_mode = true;
         }
         if button_a_pressed && !button_b_pressed {
             fine_mode = false;
         }
 
-        let fine_mode_multiplier = if fine_mode { 250.0 } else { 25.0 };
+        // Set multiplier based on mode
+        let fine_mode_multiplier = if fine_mode { 25.0 } else { 250.0 };
 
         
 
