@@ -14,7 +14,7 @@ The specifications:
 
 - [x] The lit LED should be toward the higher edge of the board along the and axes; the board can be leveled by lowering the edges to bring the lit LED toward the center. When the on LED is in the center, the and components of acceleration are close to 0 mG, so the MB2 is roughly level.
 
-- [ ] Pressing the B button (by itself) should put the level in "fine" mode: now the LED scales should go from -50 to 50 mG. Pressing the A button (by itself) should return to "coarse" mode.
+- [x] Pressing the B button (by itself) should put the level in "fine" mode: now the LED scales should go from -50 to 50 mG. Pressing the A button (by itself) should return to "coarse" mode.
 
 - [x] The level measurement and display should refresh every 200 ms (5 frames per second).
 
