@@ -24,7 +24,7 @@ struct Level <T: DelayNs> {
 }
 
 impl<T: DelayNs> Level <T> {
-    fn new(timer: Timer<T>, display: Display) -> Self {
+    fn new(timer: T, display: Display) -> Self {
         Self { timer: timer, display: display, position: Position {x:0, y:0} }
     }
 
