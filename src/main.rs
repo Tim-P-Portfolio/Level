@@ -74,7 +74,6 @@ impl<T: DelayNs> Level<T> {
 fn init() -> ! {
     rtt_init_print!();
 
-    rprintln!("Hello?");
     let mut board = Board::take().unwrap();
     let mut timer0 = Timer::new(board.TIMER0);
     let mut timer1 = Timer::new(board.TIMER1);
@@ -141,14 +140,14 @@ fn init() -> ! {
             fine_mode = false;
         }
 
-        let fine_mode_multiplier = if fine_mode { 250.0 } else { 50.0 };
+        let fine_mode_multiplier = if fine_mode { 250.0 } else { 25.0 };
 
         
 
         let x = ((-accel.x_mg() as f32) / fine_mode_multiplier).round() as i8;
         let y = ((accel.y_mg() as f32) / fine_mode_multiplier).round() as i8;
 
-        rprintln!("{:?}, {:?}", x, y);
+        rprintln!("{}, {:?}, {:?}", fine_mode, x, y);
 
         if accel.z_mg() < 0 {
             dis.set(y, x);
