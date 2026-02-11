@@ -1,16 +1,20 @@
 #![no_main] 
 #![no_std] 
 
+use cortex_m::delay;
 use cortex_m_rt::entry; 
-use embedded_hal::{digital::OutputPin, delay::DelayNs}; 
+use embedded_hal::{digital::OutputPin, delay::DelayNs, i2c::I2c}; 
 use microbit::{ 
-    board::Board, display::{self, blocking::Display}, hal::{ 
-        Delay, gpio::{Output, PushPull}, timer::{self, Timer} 
+    board::{Board, I2CInternalPins}, display::{self, blocking::Display}, hal::{ 
+        Delay, Twim, gpio::{Output, PushPull}, timer::{self, Timer}, twim 
     } 
 }; 
 use rtt_target::{rtt_init_print, rprintln}; 
 use panic_rtt_target as _; 
 
+use lsm303agr;
+
+use num_traits::float::Float;
 
 struct Position {
     x: u8,
@@ -63,27 +67,51 @@ impl<T: DelayNs> Level <T> {
 #[entry] 
 fn init() -> ! { 
     rtt_init_print!(); 
+
+    rprintln!("Hello?");
     let mut board = Board::take().unwrap(); 
-    let mut timer = Timer::new(board.TIMER0); 
+    let mut timer0 = Timer::new(board.TIMER0); 
+    let mut timer1 = Timer::new(board.TIMER1); 
 
     let pos = Position {x: 0, y: 0};
     
     let display = display::blocking::Display::new(board.display_pins);
 
-    let mut dis = Level::new(timer, display);
-    dis.set_delay(100);
+    let mut dis = Level::new(timer0, display);
+    dis.set_delay(200);
     
     // P0.08 	I2C_INT_SCL
     // P0.16 	I2C_INT_SDA
+    let i2c = Twim::new(board.TWIM0, twim::Pins { scl: board.i2c_internal.scl.degrade(), sda: board.i2c_internal.sda.degrade() }, twim::Frequency::K100);
+    
+    let mut sensor = lsm303agr::Lsm303agr::new_with_i2c(i2c);
+    sensor.init().unwrap();
+    sensor.set_accel_mode_and_odr(&mut timer1, lsm303agr::AccelMode::Normal, lsm303agr::AccelOutputDataRate::Hz100).unwrap();
+    sensor.set_mag_mode_and_odr(&mut timer1, lsm303agr::MagMode::LowPower, lsm303agr::MagOutputDataRate::Hz10).unwrap();
 
     loop {
+        // let status = sensor.mag_status();
+        
+        let accel = match sensor.acceleration() {
+            Ok(v) => v,
+            Err(e) => {rprintln!("Error getting acceleration: {:?}", e); continue; },
+        };
+        let mag = match sensor.magnetic_field() {
+            Ok(v) => v,
+            Err(e) => {rprintln!("Error getting magnetic field: {:?}", e); continue; },
+        };
         
 
-        for x in -3..=3 {
-            for y in -3..=3 {
-                dis.set(x, y);
-            }
-        }
+        rprintln!("{:?}, {:?}", mag, accel);
+
+        dis.set(0, 0);
+
+        // for x in -3..=3 {
+        //     for y in -3..=3 {
+        //         dis.set(x, y);
+        //     }
+        // }
+        // timer1.delay(100);
         
     }
 } 
